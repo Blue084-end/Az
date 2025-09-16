@@ -112,11 +112,18 @@ def generate_cockroach_pig(big_road):
             result.append("yellow")
     return result
 
-# Vẽ biểu đồ phụ
-def draw_pattern_chart(title, colors):
-    fig, ax = plt.subplots(figsize=(6, 1.5))
-    for i, c in enumerate(colors):
-        ax.scatter(i, 0, color=c, s=300)
+# Vẽ biểu đồ phụ dạng lưới giống Big Road
+def draw_pattern_grid(title, colors):
+    fig, ax = plt.subplots(figsize=(6, 4))
+    x, y = 0, 0
+    last_color = None
+    for c in colors:
+        if c == last_color:
+            y += 1
+        else:
+            x += 1
+            y = 0
+        ax.scatter(x, -y, color=c, s=300)
     ax.axis('off')
     st.subheader(title)
     st.pyplot(fig)
@@ -132,6 +139,6 @@ if st.session_state.results:
     small_road = generate_small_road(big_road)
     cockroach = generate_cockroach_pig(big_road)
 
-    draw_pattern_chart("👁️ Big Eye Boy", eye_boy)
-    draw_pattern_chart("🟥 Small Road", small_road)
-    draw_pattern_chart("🪳 Cockroach Pig", cockroach)
+    draw_pattern_grid("👁️ Big Eye Boy", eye_boy)
+    draw_pattern_grid("🟥 Small Road", small_road)
+    draw_pattern_grid("🪳 Cockroach Pig", cockroach)
