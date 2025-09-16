@@ -37,16 +37,22 @@ else:
     st.write("Chưa có kết quả nào.")
 
 # Vẽ biểu đồ Bead Plate
+
+
+
+
 def draw_bead_road(results):
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(4.5, 4))  # Giảm chiều ngang
     colors = {"B": "red", "P": "blue", "T": "green"}
     for i, r in enumerate(results):
-        x = i // 6   # Cột
-        y = - (i % 6)  # Hàng từ trên xuống
+        x = (i // 6) * 0.8   # Nhân hệ số để thu hẹp khoảng cách cột
+        y = - (i % 6)
         ax.scatter(x, y, color=colors[r], s=300)
         ax.text(x, y, r, ha='center', va='center', color='white', fontsize=12)
     ax.axis('off')
     st.pyplot(fig)
+
+
 
 if st.session_state.results:
     st.subheader("📊 Bead Plate (Đường hạt)")
