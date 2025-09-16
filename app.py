@@ -73,8 +73,8 @@ def draw_big_road(big_road):
     for x, col in enumerate(big_road):
         for y, r in enumerate(col):
             color = "red" if r == "B" else "blue"
-            ax.scatter(x, -y * 0.8, color=color, s=300)
-            ax.text(x, -y * 0.8, r, ha='center', va='center', color='white', fontsize=12)
+            ax.scatter(x, -y * 0.6, color=color, s=300)
+            ax.text(x, -y * 0.6, r, ha='center', va='center', color='white', fontsize=12)
     ax.axis('off')
     st.subheader("🔴 Big Road")
     st.pyplot(fig)
@@ -117,8 +117,8 @@ def draw_pattern_grid(title, colors, max_rows=6):
     fig, ax = plt.subplots(figsize=(6, 4))
     col, row = 0, 0
     for c in colors:
-        x = col * 0.8
-        y = -row * 0.8
+        x = col * 0.4
+        y = -row * 0.4
         ax.scatter(x, y, color=c, s=300)
         col += 1
         if col >= max_rows:
