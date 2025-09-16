@@ -41,7 +41,7 @@ def draw_bead_road(results):
     colors = {"B": "red", "P": "blue", "T": "green"}
     for i, r in enumerate(results):
         x = (i // 6) * 0.8
-        y = - (i % 6)
+        y = - (i % 6) * 0.8
         ax.scatter(x, y, color=colors[r], s=300)
         ax.text(x, y, r, ha='center', va='center', color='white', fontsize=12)
     ax.axis('off')
@@ -67,14 +67,14 @@ def generate_big_road(results):
         grid.append(col)
     return grid
 
-# Vẽ Big Road
+# Vẽ Big Road với khoảng cách hàng thu hẹp
 def draw_big_road(big_road):
     fig, ax = plt.subplots(figsize=(6, 4))
     for x, col in enumerate(big_road):
         for y, r in enumerate(col):
             color = "red" if r == "B" else "blue"
-            ax.scatter(x, -y, color=color, s=300)
-            ax.text(x, -y, r, ha='center', va='center', color='white', fontsize=12)
+            ax.scatter(x, -y * 0.8, color=color, s=300)
+            ax.text(x, -y * 0.8, r, ha='center', va='center', color='white', fontsize=12)
     ax.axis('off')
     st.subheader("🔴 Big Road")
     st.pyplot(fig)
@@ -112,18 +112,18 @@ def generate_cockroach_pig(big_road):
             result.append("yellow")
     return result
 
-# Vẽ biểu đồ phụ dạng lưới giống Big Road
+# Vẽ biểu đồ phụ dạng lưới từ trên xuống dưới rồi sang phải
 def draw_pattern_grid(title, colors, max_rows=6):
     fig, ax = plt.subplots(figsize=(6, 4))
-    x, y = 0, 0
-    last_color = None
+    col, row = 0, 0
     for c in colors:
-        if c == last_color and y < max_rows - 1:
-            y += 1
-        else:
-            x += 1
-            y = 0
-        ax.scatter(x, -y, color=c, s=300)
+        x = col * 0.8
+        y = -row * 0.8
+        ax.scatter(x, y, color=c, s=300)
+        col += 1
+        if col >= max_rows:
+            col = 0
+            row += 1
     ax.axis('off')
     st.subheader(title)
     st.pyplot(fig)
