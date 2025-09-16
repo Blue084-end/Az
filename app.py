@@ -6,17 +6,28 @@ if "results" not in st.session_state:
     st.session_state.results = []
 
 # Giao diện nhập dữ liệu
-st.title("🃏 Nhập kết quả Baccarat")
-user_input = st.text_input("Nhập kết quả (B, P, T):", max_chars=1)
+st.title("🃏 Baccarat Tracker")
+st.markdown("Nhập kết quả từng ván: `B` = Banker, `P` = Player, `T` = Tie")
 
-# Xử lý khi người dùng nhấn Enter
-if user_input.upper() in ["B", "P", "T"]:
-    st.session_state.results.append(user_input.upper())
-    st.experimental_rerun()
+with st.form("input_form"):
+    user_input = st.text_input("Nhập kết quả (B, P, T):", max_chars=1)
+    submitted = st.form_submit_button("Thêm kết quả")
+    if submitted:
+        if user_input.upper() in ["B", "P", "T"]:
+            st.session_state.results.append(user_input.upper())
+        else:
+            st.warning("Chỉ nhập B, P hoặc T thôi nhé!")
 
-# Hiển thị kết quả đã nhập
-st.subheader("📋 Danh sách kết quả đã nhập:")
-st.write(", ".join(st.session_state.results))
+# Nút xóa kết quả
+if st.button("🗑️ Xóa toàn bộ kết quả"):
+    st.session_state.results = []
+
+# Hiển thị danh sách kết quả đã nhập
+st.subheader("📋 Kết quả đã nhập:")
+if st.session_state.results:
+    st.write(", ".join(st.session_state.results))
+else:
+    st.write("Chưa có kết quả nào.")
 
 # Vẽ biểu đồ Bead Plate
 def draw_bead_road(results):
@@ -30,5 +41,6 @@ def draw_bead_road(results):
     ax.axis('off')
     st.pyplot(fig)
 
-st.subheader("📊 Bead Plate (Đường hạt)")
-draw_bead_road(st.session_state.results)
+if st.session_state.results:
+    st.subheader("📊 Bead Plate (Đường hạt)")
+    draw_bead_road(st.session_state.results)
