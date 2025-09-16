@@ -1,9 +1,11 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 
-# Khởi tạo session state để lưu kết quả
+# Khởi tạo session state
 if "results" not in st.session_state:
     st.session_state.results = []
+if "predictions" not in st.session_state:
+    st.session_state.predictions = []
 
 # Giao diện nhập dữ liệu
 st.title("🃏 Baccarat Tracker")
@@ -14,6 +16,12 @@ with st.form("input_form"):
     submitted = st.form_submit_button("Thêm kết quả")
     if submitted:
         if user_input.upper() in ["B", "P", "T"]:
+            # Dự đoán trước khi thêm kết quả mới
+            if st.session_state.results:
+                pred, conf = predict_next(st.session_state.results)
+                actual = user_input.upper()
+                verdict = "D" if pred == actual else "S"
+                st.session_state.predictions.append((pred, f"{conf}%", verdict))
             st.session_state.results.append(user_input.upper())
         else:
             st.warning("Chỉ nhập B, P hoặc T thôi nhé!")
@@ -21,6 +29,20 @@ with st.form("input_form"):
 # Nút xóa kết quả
 if st.button("🗑️ Xóa toàn bộ kết quả"):
     st.session_state.results = []
+    st.session_state.predictions = []
+
+# Hàm dự đoán kết quả tiếp theo
+def predict_next(results):
+    b = results.count("B")
+    p = results.count("P")
+    t = results.count("T")
+    total = b + p + t
+    if total == 0:
+        return "B", 50
+    counts = {"B": b, "P": p, "T": t}
+    prediction = max(counts, key=counts.get)
+    confidence = int((counts[prediction] / total) * 100)
+    return prediction, confidence
 
 # Hiển thị danh sách kết quả đã nhập
 st.subheader("📋 Kết quả đã nhập:")
@@ -48,7 +70,7 @@ def draw_bead_road(results):
     st.subheader("📊 Bead Plate (Đường hạt)")
     st.pyplot(fig)
 
-# Tạo Big Road từ kết quả
+# Tạo Big Road
 def generate_big_road(results):
     grid = []
     col = []
@@ -67,7 +89,7 @@ def generate_big_road(results):
         grid.append(col)
     return grid
 
-# Vẽ Big Road với khoảng cách hàng thu hẹp
+# Vẽ Big Road
 def draw_big_road(big_road):
     fig, ax = plt.subplots(figsize=(6, 4))
     for x, col in enumerate(big_road):
@@ -79,31 +101,17 @@ def draw_big_road(big_road):
     st.subheader("🔴 Big Road")
     st.pyplot(fig)
 
-# Biểu đồ phụ: Big Eye Boy
+# Biểu đồ phụ
 def generate_big_eye_boy(big_road):
-    result = []
-    for col in range(1, len(big_road)):
-        if len(big_road[col]) == len(big_road[col - 1]):
-            result.append("red")
-        else:
-            result.append("blue")
-    return result
+    return ["red" if len(big_road[i]) == len(big_road[i - 1]) else "blue" for i in range(1, len(big_road))]
 
-# Biểu đồ phụ: Small Road
 def generate_small_road(big_road):
-    result = []
-    for col in range(2, len(big_road)):
-        if len(big_road[col]) == len(big_road[col - 2]):
-            result.append("red")
-        else:
-            result.append("blue")
-    return result
+    return ["red" if len(big_road[i]) == len(big_road[i - 2]) else "blue" for i in range(2, len(big_road))]
 
-# Biểu đồ phụ: Cockroach Pig
 def generate_cockroach_pig(big_road):
     result = []
-    for col in range(3, len(big_road)):
-        diff = abs(len(big_road[col]) - len(big_road[col - 3]))
+    for i in range(3, len(big_road)):
+        diff = abs(len(big_road[i]) - len(big_road[i - 3]))
         if diff == 0:
             result.append("red")
         elif diff == 1:
@@ -112,7 +120,7 @@ def generate_cockroach_pig(big_road):
             result.append("yellow")
     return result
 
-# Vẽ biểu đồ phụ dạng lưới từ trên xuống dưới rồi sang phải
+# Vẽ biểu đồ dạng lưới
 def draw_pattern_grid(title, colors, max_rows=6):
     fig, ax = plt.subplots(figsize=(4.5, 3.5))
     x, y = 0, 0
@@ -126,17 +134,32 @@ def draw_pattern_grid(title, colors, max_rows=6):
     st.subheader(title)
     st.pyplot(fig)
 
-# Hiển thị tất cả biểu đồ nếu có dữ liệu
+# Vẽ biểu đồ dự đoán
+def draw_prediction_grid(predictions, max_rows=6):
+    fig, ax = plt.subplots(figsize=(6, 4))
+    x, y = 0, 0
+    for pred, conf, verdict in predictions:
+        for val in [pred, conf, verdict]:
+            ax.text(x * 0.5, -y * 0.6, val, ha='center', va='center',
+                    bbox=dict(boxstyle="circle", facecolor="lightgray"), fontsize=10)
+            x += 1
+        if x >= max_rows * 3:
+            x = 0
+            y += 1
+    ax.axis('off')
+    st.subheader("🔮 Dự đoán tiếp theo")
+    st.pyplot(fig)
+
+# Hiển thị tất cả biểu đồ
 if st.session_state.results:
     draw_bead_road(st.session_state.results)
 
     big_road = generate_big_road(st.session_state.results)
     draw_big_road(big_road)
 
-    eye_boy = generate_big_eye_boy(big_road)
-    small_road = generate_small_road(big_road)
-    cockroach = generate_cockroach_pig(big_road)
+    draw_pattern_grid("👁️ Big Eye Boy", generate_big_eye_boy(big_road))
+    draw_pattern_grid("🟥 Small Road", generate_small_road(big_road))
+    draw_pattern_grid("🪳 Cockroach Pig", generate_cockroach_pig(big_road))
 
-    draw_pattern_grid("👁️ Big Eye Boy", eye_boy)
-    draw_pattern_grid("🟥 Small Road", small_road)
-    draw_pattern_grid("🪳 Cockroach Pig", cockroach)
+    if st.session_state.predictions:
+        draw_prediction_grid(st.session_state.predictions)
