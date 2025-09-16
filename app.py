@@ -25,7 +25,14 @@ if st.button("🗑️ Xóa toàn bộ kết quả"):
 # Hiển thị danh sách kết quả đã nhập
 st.subheader("📋 Kết quả đã nhập:")
 if st.session_state.results:
-    st.write(", ".join(st.session_state.results))
+    # Hiển thị theo lưới 6 hàng
+    grid = [["" for _ in range((len(st.session_state.results) + 5) // 6)] for _ in range(6)]
+    for i, r in enumerate(st.session_state.results):
+        col = i // 6
+        row = i % 6
+        grid[row][col] = r
+    for row in grid:
+        st.write(" | ".join([r if r else " " for r in row]))
 else:
     st.write("Chưa có kết quả nào.")
 
@@ -34,8 +41,8 @@ def draw_bead_road(results):
     fig, ax = plt.subplots(figsize=(6, 4))
     colors = {"B": "red", "P": "blue", "T": "green"}
     for i, r in enumerate(results):
-        x = i % 6
-        y = -i // 6
+        x = i // 6   # Cột
+        y = - (i % 6)  # Hàng từ trên xuống
         ax.scatter(x, y, color=colors[r], s=300)
         ax.text(x, y, r, ha='center', va='center', color='white', fontsize=12)
     ax.axis('off')
