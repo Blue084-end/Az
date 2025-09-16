@@ -113,12 +113,12 @@ def generate_cockroach_pig(big_road):
     return result
 
 # Vẽ biểu đồ phụ dạng lưới giống Big Road
-def draw_pattern_grid(title, colors):
+def draw_pattern_grid(title, colors, max_rows=6):
     fig, ax = plt.subplots(figsize=(6, 4))
     x, y = 0, 0
     last_color = None
     for c in colors:
-        if c == last_color:
+        if c == last_color and y < max_rows - 1:
             y += 1
         else:
             x += 1
