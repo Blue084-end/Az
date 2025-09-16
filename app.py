@@ -40,9 +40,9 @@ def draw_bead_road(results):
     fig, ax = plt.subplots(figsize=(4.5, 4))
     colors = {"B": "red", "P": "blue", "T": "green"}
     for i, r in enumerate(results):
-        x = (i // 6) * 0.7
-        y = - (i % 6) * 0.7
-        ax.scatter(x, y, color=colors[r], s=250)
+        x = (i // 6) * 0.6
+        y = - (i % 6) * 0.6
+        ax.scatter(x, y, color=colors[r], s=220)
         ax.text(x, y, r, ha='center', va='center', color='white', fontsize=12)
     ax.axis('off')
     st.subheader("📊 Bead Plate (Đường hạt)")
@@ -73,8 +73,8 @@ def draw_big_road(big_road):
     for x, col in enumerate(big_road):
         for y, r in enumerate(col):
             color = "red" if r == "B" else "blue"
-            ax.scatter(x * 0.7, -y * 0.7, color=color, s=250)
-            ax.text(x * 0.7, -y * 0.7, r, ha='center', va='center', color='white', fontsize=12)
+            ax.scatter(x * 0.6, -y * 0.6, color=color, s=220)
+            ax.text(x * 0.6, -y * 0.6, r, ha='center', va='center', color='white', fontsize=12)
     ax.axis('off')
     st.subheader("🔴 Big Road")
     st.pyplot(fig)
@@ -114,10 +114,10 @@ def generate_cockroach_pig(big_road):
 
 # Vẽ biểu đồ phụ dạng lưới từ trên xuống dưới rồi sang phải
 def draw_pattern_grid(title, colors, max_rows=6):
-    fig, ax = plt.subplots(figsize=(5, 3.5))
+    fig, ax = plt.subplots(figsize=(4.5, 3.5))
     x, y = 0, 0
     for c in colors:
-        ax.scatter(x * 0.7, -y * 0.7, color=c, s=250)
+        ax.scatter(x * 0.5, -y * 0.6, color=c, s=220)
         y += 1
         if y >= max_rows:
             y = 0
