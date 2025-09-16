@@ -7,30 +7,6 @@ if "results" not in st.session_state:
 if "predictions" not in st.session_state:
     st.session_state.predictions = []
 
-# Giao diện nhập dữ liệu
-st.title("🃏 Baccarat Tracker")
-st.markdown("Nhập kết quả từng ván: `B` = Banker, `P` = Player, `T` = Tie")
-
-with st.form("input_form"):
-    user_input = st.text_input("Nhập kết quả (B, P, T):", max_chars=1)
-    submitted = st.form_submit_button("Thêm kết quả")
-    if submitted:
-        if user_input.upper() in ["B", "P", "T"]:
-            # Dự đoán trước khi thêm kết quả mới
-            if st.session_state.results:
-                pred, conf = predict_next(st.session_state.results)
-                actual = user_input.upper()
-                verdict = "D" if pred == actual else "S"
-                st.session_state.predictions.append((pred, f"{conf}%", verdict))
-            st.session_state.results.append(user_input.upper())
-        else:
-            st.warning("Chỉ nhập B, P hoặc T thôi nhé!")
-
-# Nút xóa kết quả
-if st.button("🗑️ Xóa toàn bộ kết quả"):
-    st.session_state.results = []
-    st.session_state.predictions = []
-
 # Hàm dự đoán kết quả tiếp theo
 def predict_next(results):
     b = results.count("B")
@@ -43,6 +19,28 @@ def predict_next(results):
     prediction = max(counts, key=counts.get)
     confidence = int((counts[prediction] / total) * 100)
     return prediction, confidence
+
+# Giao diện nhập dữ liệu
+st.title("🃏 Baccarat Tracker")
+st.markdown("Nhập kết quả từng ván: `B` = Banker, `P` = Player, `T` = Tie")
+
+with st.form("input_form"):
+    user_input = st.text_input("Nhập kết quả (B, P, T):", max_chars=1)
+    submitted = st.form_submit_button("Thêm kết quả")
+    if submitted:
+        if user_input.upper() in ["B", "P", "T"]:
+            new_result = user_input.upper()
+            pred, conf = predict_next(st.session_state.results)
+            verdict = "D" if pred == new_result else "S"
+            st.session_state.predictions.append((pred, f"{conf}%", verdict))
+            st.session_state.results.append(new_result)
+        else:
+            st.warning("Chỉ nhập B, P hoặc T thôi nhé!")
+
+# Nút xóa kết quả
+if st.button("🗑️ Xóa toàn bộ kết quả"):
+    st.session_state.results = []
+    st.session_state.predictions = []
 
 # Hiển thị danh sách kết quả đã nhập
 st.subheader("📋 Kết quả đã nhập:")
